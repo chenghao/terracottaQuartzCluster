@@ -16,23 +16,20 @@ public class DetailQuartzJobBean extends QuartzJobBean {
 	@Override
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 		try {
-			String targetObject1 = (String) context.getMergedJobDataMap().get("targetObject");
-			this.setTargetObject(targetObject1);
+			//targetObject和targetMethod是spring-quartz.xml文件中jobDataAsMap属性的key
+			this.setTargetObject((String) context.getMergedJobDataMap().get("targetObject"));
+			this.setTargetMethod((String) context.getMergedJobDataMap().get("targetMethod"));
 
-			String targetMethod1 = (String) context.getMergedJobDataMap().get("targetMethod");
-			this.setTargetMethod(targetMethod1);
-
+			//applicationContextKey是spring-quartz.xml文件中applicationContextSchedulerContextKey属性的value
 			cxt = (ApplicationContext) context.getScheduler().getContext().get("applicationContextKey");
 			Object otargetObject = cxt.getBean(targetObject);
 
 			Method m = otargetObject.getClass().getMethod(targetMethod, new Class[] {});
-
 			m.invoke(otargetObject, new Object[] {});
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new JobExecutionException(e);
 		}
-
 	}
 
 	public void setTargetObject(String targetObject) {
